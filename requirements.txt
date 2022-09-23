@@ -1,0 +1,4 @@
+simplejson
+zeep
+python-stdnum==1.13
+pycountry
