@@ -1,0 +1,19 @@
+<odoo>
+    <data>
+        <record id="view_event_event_form_aktiv_inherited" model="ir.ui.view">
+            <field name="name">stock.landed.cost.form</field>
+            <field name="model">stock.landed.cost</field>
+            <field name="inherit_id" ref="stock_landed_costs.view_stock_landed_cost_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='picking_ids']" position="attributes">
+                    <attribute name="context">{'picking_id':True}</attribute>
+                </xpath>
+                <xpath expr="//page[@name='additional_costs']//tree//field[@name='split_method']" position="after">
+                    <field name="cost_id" invisible="1"/>
+                    <field name="by_product_id" context="{'cost_id': cost_id}"
+                           attrs="{'invisible':[('split_method','!=','by_product')], 'required':[('split_method','=','by_product')]}"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
