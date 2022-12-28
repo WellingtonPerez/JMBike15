@@ -1,0 +1,4 @@
+[submodule "WellingtonPerez/landed_cost"]
+	path = WellingtonPerez/landed_cost
+	url = git@github.com:WellingtonPerez/landed_cost.git
+	branch = 15.0
