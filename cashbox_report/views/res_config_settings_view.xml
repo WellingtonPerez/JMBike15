@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.cashbox</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="100"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block"
+                         data-string="Cashbox Report"
+                         string="Cashbox Report"
+                         data-key="cashbox_report"
+                         groups="cashbox_report.group_cashbox_manager">
+                        <h2>Extra report options</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="show_payment_method"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Show payment method details</span>
+                                    <div class="text-muted">
+                                        This option allows you to display a table with the totals by payment method.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="show_charge_client"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Show charge client total</span>
+                                    <div class="text-muted">
+                                        This option allows showing the total of collections made to customers.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="show_balance_favor"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Show balance in favor</span>
+                                    <div class="text-muted">
+                                        This option shows the balance that is in favor of customers.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="show_invoice_advance"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">Show invoice advance</span>
+                                    <div class="text-muted">
+                                        This option shows the total of the invoices paid with advances.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="action_cashbox_config" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'cashbox_report'}</field>
+        </record>
+
+        <menuitem name="Configuration"
+            id="menu_cashbox_config_settings"
+            parent="cashbox_main_menu"
+            groups="cashbox_report.group_cashbox_manager"
+            sequence="100"/>
+        
+        <menuitem name="Settings"
+            id="menu_commission_general_settings"
+            parent="menu_cashbox_config_settings"
+            action="action_cashbox_config"
+            groups="cashbox_report.group_cashbox_manager"
+            sequence="0"/>
+    </data>
+</odoo>

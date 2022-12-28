@@ -1,0 +1,7 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+access_cashbox_cashier,access_cashbox_cashier_user,model_cashbox_cashier,cashbox_report.group_cashbox_user,1,1,1,0
+access_cashbox_cashier,access_cashbox_cashier_invoice_user,model_cashbox_cashier,account.group_account_invoice,1,1,1,0
+access_cashbox_cashier,access_cashbox_cashier_manager,model_cashbox_cashier,cashbox_report.group_cashbox_manager,1,1,1,1
+access_cashbox_cashier_coin_manager,access_cashbox_cashier_coin_manager,model_cashbox_coin,cashbox_report.group_cashbox_manager,1,1,1,1
+access_cashbox_cashier_coin_user,access_cashbox_cashier_coin_user,model_cashbox_coin,cashbox_report.group_cashbox_user,1,1,1,0
+access_cashbox_cashier_coin_user,access_cashbox_cashier_coin_invoice_user,model_cashbox_coin,account.group_account_invoice,1,1,1,0

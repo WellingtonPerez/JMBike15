@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <report
+    id="cashbox_report"
+    string="Cierre de Caja"
+    model="account.payment"
+    report_type="qweb-pdf"
+    name="cashbox_report.report_cashflow"
+    file="cashbox_report.report_cashflow"/>
+</odoo>

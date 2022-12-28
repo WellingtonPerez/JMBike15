@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="coin_value_1" model="cashbox.coin">
+        <field name="coin_value">1</field>
+        <field name="number">1</field>
+    </record>
+
+    <record id="coin_value_5" model="cashbox.coin">
+        <field name="coin_value">5</field>
+        <field name="number">1</field>
+    </record>
+
+    <record id="coin_value_10" model="cashbox.coin">
+        <field name="coin_value">10</field>
+        <field name="number">1</field>
+    </record>
+
+    <record id="coin_value_25" model="cashbox.coin">
+        <field name="coin_value">25</field>
+        <field name="number">1</field>
+    </record>
+
+    <record id="coin_value_50" model="cashbox.coin">
+        <field name="coin_value">50</field>
+        <field name="number">1</field>
+    </record>
+
+    <record id="coin_value_100" model="cashbox.coin">
+        <field name="coin_value">100</field>
+        <field name="number">1</field>
+    </record>
+
+    <record id="coin_value_200" model="cashbox.coin">
+        <field name="coin_value">200</field>
+        <field name="number">1</field>
+    </record>
+
+    <record id="coin_value_500" model="cashbox.coin">
+        <field name="coin_value">500</field>
+        <field name="number">1</field>
+    </record>
+
+    <record id="coin_value_1000" model="cashbox.coin">
+        <field name="coin_value">1000</field>
+        <field name="number">1</field>
+    </record>
+
+    <record id="coin_value_2000" model="cashbox.coin">
+        <field name="coin_value">2000</field>
+        <field name="number">1</field>
+    </record>
+    
+     <record id="cashbox_cashier_sequence" model="ir.sequence">
+            <field name="name">Cashier sequence</field>
+            <field name="code">cashbox.cashier</field>
+            <field name="prefix">CASH/%(year)s/</field>
+            <field name="padding">6</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+</odoo>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem name="Cierre de Caja"
+        id="cashbox_main_menu"
+        web_icon="cashbox_report,static/description/icon.png"
+        groups="cashbox_report.group_cashbox_manager"
+        sequence="100"
+    />
+
+    <record model="ir.ui.view" id="view_account_cashbox_tree">
+        <field name="name">account.cashbox.tree</field>
+        <field name="model">account.cashbox</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="cashier"/>
+                <field name="date"/>
+                <field name="cash_amount"/>
+                <field name='bank_amount'/>
+                <field name="check_amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_account_cashbox_form">
+        <field name="name">account.cashbox.form</field>
+        <field name="model">account.cashbox</field>
+        <field name="arch" type="xml">
+            <form>
+                <header >
+                    <button string='Generar reporte' name="check_report" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <div class="oe_title oe_inline">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="cashier"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="cash_amount"/>
+                            <field name='bank_amount'/>
+                            <field name="check_amount"/>
+                            <field name="credit_card_amount"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="cashbox_coin_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="coin_value"/>
+                                <field name="number"/>
+                                <field name="subtotal" sum="Total"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="account_cashbox_action" model="ir.actions.act_window">
+        <field name="name">Cierre de caja</field>
+        <field name="res_model">account.cashbox</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_account_cashbox_tree"/>
+    </record>
+
+    <menuitem id="menu_cashbox_accounting"
+              name="Cierre de Caja"
+              parent="cashbox_main_menu"
+              action="account_cashbox_action"
+              groups="cashbox_report.group_cashbox_manager"
+              sequence="100"/>
+
+</odoo>

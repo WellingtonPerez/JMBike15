@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_cashbox_main">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="box_total" t-value="0.0"/>
+                    <t t-set="total_cash" t-value="0.0"/>
+                    <t t-set="cashier_total" t-value="0.0"/>
+                    <t t-set="columns" t-value="headers[2:]"/>
+                    <t t-set="index" t-value="True" />
+                    <t t-set="sales" t-value="0.0"/>
+                    <t t-set="shop_subtotal" t-value="0.0"/>
+                    <t t-set="style" t-value="'page-break-before: avoid;'" />
+                    <div class="page">
+                        <style>
+                            .level_1 {
+                                text-indent: 25px;
+                            }
+                            .level_2 {
+                                text-indent: 50px;
+                            }
+                            tr,td {padding:3px !important; margin:3px !important;}
+                        </style>
+                        <section>
+                            <div class="text-center">
+                                <h3 class="text-center">Cuadre de Caja</h3>
+                            </div>
+                            <div class="row col-md-12 text-muted">
+                                <div class="col-xs-6 pull-left mtb6">
+                                    <strong>
+                                        <p>Usuario: <span t-esc="o.cashier.name"/></p>
+                                        <p>Fecha: <span t-esc="o.date"/></p>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="row col-md-12">
+                                <div class="col-xs-6 pull-right mtb6">
+                                    <h5 class="text-center"><b>Desglose de Caja</b></h5>
+                                    <table class="table" style="padding:3px !important; margin:3px !important;">
+                                        <thea>
+                                            <tr>
+                                                <th>Billete</th>
+                                                <th></th>
+                                                <th>Cantidad</th>
+                                                <th></th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thea>
+                                        <tbody>
+                                            <t t-foreach="o.cashbox_coin_ids" t-as="coin">
+                                                <t t-set="cashier_total" t-value="cashier_total + coin.subtotal"/>
+                                                <tr>
+                                                    <td>
+                                                        <span t-field="coin.coin_value" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-center">X</span>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span t-field="coin.number"/>
+                                                    </td>
+
+                                                    <td>
+                                                        <span class="text-center">=</span>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span t-field="coin.subtotal" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                    <hr/>
+                                    <table class="table table-sm" style="padding:3px !important; margin:3px !important;">
+                                        <tr>
+                                            <td>
+                                                <strong>Total Efectivo</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="cashier_total" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Total Banco</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="o.bank_amount" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Total Cheques</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="o.check_amount" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Total Tarjeta</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="o.credit_card_amount" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <t t-set="box_total" t-value="box_total + cashier_total + o.bank_amount + o.check_amount + o.credit_card_amount"/>
+                                            <td>
+                                                <strong>Total</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="box_total" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-xs-6 pull-left mtb6">
+                                    <div>
+                                        <h5 class="text-center"><b>Fuentes de Efectivo</b></h5>
+                                        <table class="table">
+                                            <t t-set="charge_balance_advance" t-value="0.0"/>
+                                            <t t-foreach="data" t-as="rec">
+                                                <t t-if="rec_index > 0">
+                                                    <t t-set="index" t-value="False"/>
+                                                </t>
+                                                <t t-foreach="rec_value" t-as="shop">
+                                                    <t t-set="shop_subtotal" t-value="shop_subtotal + shop_value"/>
+                                                    <t t-if="shop == 'Contado'">
+                                                        <t t-set="sales" t-value="sales + shop_value"/>
+                                                    </t>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Ventas de <span t-esc="shop"/></strong>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-esc="shop_value" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                            <tr>
+                                                <td>
+                                                    <strong>Notas de Créditos Aplicadas</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="credit_notes" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <strong>Ventas de Contado Neto</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="sales - credit_notes" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="o.company_id.show_invoice_advance">
+                                                <td>
+                                                    <strong>Facturas Pagadas con Anticipo</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <t t-set="charge_balance_advance" t-value="charge_balance_advance-advance"/>
+                                                    <span t-esc="advance" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="o.company_id.show_charge_client">
+                                                <td>
+                                                    <strong>Cobros a Clientes</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <t t-set="customer_payments" t-value="sum([x.get('Monto') for x in other_payment_details])"/>
+                                                    <t t-set="charge_balance_advance" t-value="charge_balance_advance+customer_payments"/>
+                                                    <span t-esc="customer_payments" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="o.company_id.show_balance_favor">
+                                                <td>
+                                                    <strong>Balance a favor del cliente</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <t t-set="charge_balance_advance" t-value="charge_balance_advance-balance_favor"/>
+                                                    <span t-esc="balance_favor" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <strong>Total</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <t t-set="total_cash" t-value="sales - credit_notes"/>
+                                                    <t t-if="o.company_id.show_invoice_advance">
+                                                        <t t-set="total_cash" t-value="total_cash - advance"/>
+                                                    </t>
+                                                    <t t-if="o.company_id.show_charge_client">
+                                                        <t t-set="total_cash" t-value="total_cash + customer_payments"/>
+                                                    </t>
+                                                    <t t-if="o.company_id.show_balance_favor">
+                                                        <t t-set="total_cash" t-value="total_cash - balance_favor"/>
+                                                    </t>
+                                                    <strong>
+                                                        <span t-esc="total_cash" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <strong>NC Emitidas</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="credit_notes_issued" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <strong>Total Facturado</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="shop_subtotal - credit_notes_issued" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <strong>Diferencia en cuadre</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="box_total - total_cash" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="row" t-if="o.company_id.show_payment_method">
+                                        <t t-set="total_payments" t-value="0"/>
+                                        <div class="col-lg-12 mtb32">
+                                            <h5 class="text-center"><b>Métodos de Pago</b></h5>
+                                            <table class="table table-sm">
+                                                <t t-foreach="payment_methods" t-as="p">
+                                                    <t t-set="total_payments" t-value="total_payments + p_value"/>
+                                                    <tr>
+                                                        <td>
+                                                            <strong><span t-esc="p"/></strong>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <t t-if="p_value">
+                                                                <span t-esc="p_value" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                            </t>
+                                                            <t t-else="">
+                                                                RD$ 0.0
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Total</strong>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <strong><span t-esc="total_payments" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></strong>
+                                                    </td>
+                                                </tr>
+                                                <!--<tr>-->
+                                                    <!--<td>-->
+                                                        <!--<strong>Diferencia Métodos de pago vs Fuentes de Efectivo</strong>-->
+                                                    <!--</td>-->
+                                                    <!--<td class="text-right">-->
+                                                        <!--<strong><span t-esc="total_payments - total_cash" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></strong>-->
+                                                    <!--</td>-->
+                                                <!--</tr>-->
+                                                <!--<tr>-->
+                                                    <!--<td>-->
+                                                        <!--<strong>Diferencia Desglose de Caja vs Métodos de pago</strong>-->
+                                                    <!--</td>-->
+                                                    <!--<td class="text-right">-->
+                                                        <!--<strong><span t-esc="box_total - total_payments" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></strong>-->
+                                                    <!--</td>-->
+                                                <!--</tr>-->
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" if="cash_invoice_open">
+                                <h3>Facturas de Contado no Pagadas</h3>
+                                <table class="table-sm" style="width:100% !important;">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">NCF</th>
+                                            <th class="text-center">Cliente</th>
+                                            <th class="text-center">Fecha</th>
+                                            <th class="text-center">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="cash_invoice_open" t-as="inv">
+                                            <tr>
+                                                <td class="text-left"><span t-esc="inv.get('number')"/> </td>
+												<td class="text-left"><span t-esc="inv.get('partner')"/> </td>
+												<td class="text-left"><span t-esc="inv.get('date')"/> </td>
+												<td class="text-left"><span t-esc="inv.get('amount')"/> </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <hr/>
+                                <table class="table-sm" style="width:100% !important; margin-top:50px; margin-bottom:30px;">
+                                    <tr>
+                                        <td class="text-center" style="width:30%;">
+                                                __________________________________
+                                        </td>
+                                        <td class="text-center" style="width:30%;">
+                                                __________________________________
+                                        </td>
+                                        <td class="text-center" style="width:30%;">
+                                                __________________________________
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center" style="width:30%;">
+                                            <strong>Responsable de caja</strong>
+                                        </td>
+                                        <td class="text-center" style="width:30%;">
+                                            <strong>Recibido por</strong>
+                                        </td>
+                                        <td class="text-center" style="width:30%;">
+                                            <strong>Auditado por</strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </section>
+                         <section>
+                            <div class="col-lg-12 row" style="page-break-before: always;" t-if="o.company_id.show_charge_client">
+                                <h3>Detalle de Cobros a Clientes</h3>
+                                <hr/>
+                                <table class="table table-condensed table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th><strong>Fecha</strong></th>
+                                            <th><strong>Referencia</strong></th>
+                                            <th><strong>Cliente</strong></th>
+                                            <th><strong>Monto</strong></th>
+                                            <th><strong>Método de Pago</strong></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="payment_detail_total" t-value="0.0"/>
+                                        <t t-foreach="other_payment_details" t-as="item">
+                                            <t t-set="payment_detail_total" t-value="payment_detail_total + item['Monto']"/>
+                                            <tr>
+                                                <td class="text-left">
+                                                    <span t-esc="item['Fecha']"/>
+                                                </td>
+                                                <td class="text-left">
+                                                    <span t-esc="item['Referencia']"/>
+                                                </td>
+                                                <td class="text-left">
+                                                    <span t-esc="item['Cliente']"/>
+                                                </td>
+                                                <td class="text-left">
+                                                    <span t-esc="item['Monto']" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                </td>
+                                                <td class="text-left">
+                                                    <span t-esc="item['Metodo de pago']"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <tr>
+                                            <td class="text-left">
+                                                <strong>Total</strong>
+                                            </td>
+                                            <td class="text-right" colspan="3">
+                                                <strong><span t-esc="payment_detail_total" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></strong>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                        <section>
+                            <t t-foreach="invoices" t-as="item">
+                                <div class="col-lg-12 row" style="page-break-before: always;">
+                                     <h3>Detalle de facturas</h3>
+                                     <hr/>
+                                     <table class="table table-condensed table-bordered">
+                                         <thead>
+                                             <tr>
+                                                 <t t-foreach="headers" t-as="h">
+                                                     <t t-if="h == 'Credito'">
+                                                        <th>Crédito</th>
+                                                     </t>
+                                                     <t t-else="">
+                                                        <th><span t-esc="h"/></th>
+                                                     </t>
+                                                 </t>
+                                             </tr>
+                                         </thead>
+                                         <tbody style="font-size:10px;">
+                                            <t t-foreach="item_value" t-as="row">
+                                                 <tr>
+                                                     <td><span t-esc="row['number']"/></td>
+                                                     <td><span t-esc="row['partner']"/></td>
+                                                     <t t-foreach="columns" t-as="c">
+                                                         <td><span t-esc="row.get(c, 0.0)" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></td>
+                                                     </t>
+                                                 </tr>
+                                             </t>
+                                             <tr>
+                                                <td colspan="2" class="text-center"><strong>Totales</strong></td>
+                                                <t t-foreach="columns" t-as="c">
+                                                    <t t-set="value" t-value="0.0"/>
+                                                    <t t-foreach="item_value" t-as="rec">
+                                                        <t t-set="value" t-value="value + rec.get(c, 0.0)"/>
+
+                                                    </t>
+                                                     <td>
+                                                         <strong>
+                                                            <span t-esc="value" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                        </strong>
+                                                     </td>
+                                                </t>
+                                             </tr>
+                                         </tbody>
+                                     </table>
+                                </div>
+                            </t>
+                        </section>
+                        <div class="row col-xs-6 pull-left">
+                            <h5><strong>Observaciones:</strong></h5>
+                            <hr/>
+                            <soan t-esc="o.note"/>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <report id="action_report_cashbox_manager"
+        model="account.cashbox"
+        string="Reporte Cierre de caja"
+        report_type="qweb-pdf"
+        name="cashbox_report.report_cashbox_main"
+        file="cashbox_report.report_cashbox_main"
+    />
+
+</odoo>
