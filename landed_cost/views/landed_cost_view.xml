@@ -37,6 +37,7 @@
                         <field name="actual_cost" widget="monetary" readonly="1"/>
                         <field name="additional_cost" widget="monetary" readonly="1"/>
                         <field name="new_cost" widget="monetary" readonly="1"/>
+                        <field name="margin"/>
                         <field name="list_price" widget="monetary" readonly="0" string="Nuevo Precio Venta"/>
                         <field name="change_price" readonly="0"/>
                     </tree>

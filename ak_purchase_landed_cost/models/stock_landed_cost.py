@@ -14,6 +14,7 @@ SPLIT_METHOD = [
     ('by_weight', 'By Weight'),
     ('by_volume', 'By Volume'),
     ('by_product', 'By Product'),
+    ('duty', 'Duty')
 ]
 
 
@@ -60,8 +61,8 @@ class StockLandedCost(models.Model):
 
                 # Prorate the value at what's still in stock
                 cost_to_add = (
-                    remaining_qty / line.move_id.product_qty) * \
-                    line.additional_landed_cost
+                                      remaining_qty / line.move_id.product_qty) * \
+                              line.additional_landed_cost
                 if not cost.company_id.currency_id.is_zero(cost_to_add):
                     values = {
                         'value': cost_to_add,
@@ -114,7 +115,7 @@ class StockLandedCost(models.Model):
             if cost.vendor_bill_id and cost.vendor_bill_id.state == 'posted' \
                     and cost.company_id.anglo_saxon_accounting:
                 all_amls = cost.vendor_bill_id.line_ids | \
-                    cost.account_move_id.line_ids
+                           cost.account_move_id.line_ids
                 for product in cost.cost_lines.product_id:
                     accounts = product.product_tmpl_id.get_product_accounts()
                     input_account = accounts['stock_input']
@@ -138,19 +139,15 @@ class StockLandedCost(models.Model):
             total_line = 0.0
             all_val_line_values = cost.get_valuation_lines()
             for val_line_values in all_val_line_values:
-                for cost_line in cost.cost_lines:
-                    if cost_line.split_method == 'by_product' and \
-                        cost_line.by_product_id.id == val_line_values[
-                            'product_id']:
-                        val_line_values.update(
-                            {'cost_id': cost.id, 'cost_line_id': cost_line.id})
-                        self.env['stock.valuation.adjustment.lines'].create(
-                            val_line_values)
-                    if cost_line.split_method != 'by_product':
-                        val_line_values.update(
-                            {'cost_id': cost.id, 'cost_line_id': cost_line.id})
-                        self.env['stock.valuation.adjustment.lines'].create(
-                            val_line_values)
+                for cost_line in cost.cost_lines.filtered(
+                        lambda x: x.product_id.product_tmpl_id.split_method_landed_cost != 'duty'):
+                    val_line_values.update({'cost_id': cost.id, 'cost_line_id': cost_line.id})
+                    self.env['stock.valuation.adjustment.lines'].create(val_line_values)
+                for cost_line in cost.cost_lines.filtered(
+                        lambda x: x.product_id.product_tmpl_id.split_method_landed_cost == 'duty'):
+                    val_line_values.update({'cost_id': cost.id, 'cost_line_id': cost_line.id})
+                    self.env['stock.valuation.adjustment.lines'].create(val_line_values)
+
                 total_qty += val_line_values.get('quantity', 0.0)
                 total_weight += val_line_values.get('weight', 0.0)
                 total_volume += val_line_values.get('volume', 0.0)
@@ -161,7 +158,7 @@ class StockLandedCost(models.Model):
 
                 total_line += 1
 
-            for line in cost.cost_lines:
+            for line in cost.cost_lines.filtered(lambda x:x.split_method != 'duty'):
                 value_split = 0.0
                 for valuation in cost.valuation_adjustment_lines:
                     value = 0.0
@@ -185,6 +182,50 @@ class StockLandedCost(models.Model):
                         elif line.split_method == 'by_product':
                             per_unit = (line.price_unit / total_qty)
                             value = valuation.former_cost * per_unit
+                        elif line.split_method == 'duty':
+                            if valuation.product_id.duty_ok:
+                                print(valuation)
+                                insurance_product_id = valuation.cost_line_id.product_id.insurance_product_id
+                                freight_product_id = valuation.cost_line_id.product_id.freight_product_id
+                                print(valuation.product_id)
+                                print(valuation.product_id.name)
+                                aditional_landed_cost = cost.valuation_adjustment_lines.filtered(lambda
+                                                                             x: x.product_id == valuation.product_id and x.cost_line_id != valuation.cost_line_id)
+                                print(aditional_landed_cost)
+                                print(towrite_dict)
+
+                            value = 0
+                        else:
+                            value = (line.price_unit / total_line)
+
+                        if digits:
+                            value = tools.float_round(
+                                value, precision_digits=digits,
+                                rounding_method='UP')
+                            fnc = min if line.price_unit > 0 else max
+                            value = fnc(value, line.price_unit - value_split)
+                            value_split += value
+
+                        if valuation.id not in towrite_dict:
+                            towrite_dict[valuation.id] = value
+                        else:
+                            towrite_dict[valuation.id] += value
+            for line in cost.cost_lines.filtered(lambda x:x.split_method == 'duty'):
+                value_split = 0.0
+                for valuation in cost.valuation_adjustment_lines:
+                    value = 0.0
+                    product_cost = valuation.former_cost
+                    if valuation.cost_line_id and \
+                            valuation.cost_line_id.id == line.id:
+                        if valuation.product_id.duty_ok:
+                            insurance_product_id = valuation.cost_line_id.product_id.insurance_product_id
+                            freight_product_id = valuation.cost_line_id.product_id.freight_product_id
+                            aditional_landed_cost = cost.valuation_adjustment_lines.filtered(lambda
+                                                                                                     x: x.product_id == valuation.product_id and x.cost_line_id.product_id in [insurance_product_id,freight_product_id])
+                            for landed_cost in aditional_landed_cost:
+                                product_cost += towrite_dict[landed_cost.id]
+
+                            value = (product_cost * valuation.product_id.duty_pecent) / 100
                         else:
                             value = (line.price_unit / total_line)
 
@@ -207,7 +248,6 @@ class StockLandedCost(models.Model):
 
 
 class StockLandedCostLine(models.Model):
-
     _inherit = 'stock.landed.cost.lines'
 
     split_method = fields.Selection(
@@ -232,4 +272,3 @@ class StockLandedCostLine(models.Model):
                 ('id', 'in', picking_ids)]).mapped('move_ids_without_package')
             product_ids = move_ids.mapped('product_id').ids
             return {'domain': {'by_product_id': [('id', 'in', product_ids)]}}
-

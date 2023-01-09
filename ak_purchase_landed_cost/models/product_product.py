@@ -2,7 +2,7 @@
 # Part of Odoo, Aktiv Software
 # See LICENSE file for full copyright & licensing details.
 
-from odoo import models, api
+from odoo import models, api, fields
 
 
 class ProductProduct(models.Model):
@@ -18,3 +18,15 @@ class ProductProduct(models.Model):
             product_ids += move_ids.mapped('product_id').ids
             return set(product_ids)
         return super()._search(args, offset, limit, order, count, access_rights_uid)
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    split_method_landed_cost = fields.Selection(selection_add=[('duty', 'Duty')])
+
+    duty_ok = fields.Boolean(string='Have Duty')
+    duty_pecent = fields.Float(string="Duty Percent")
+
+    insurance_product_id = fields.Many2one('product.product', string="Insurance")
+    freight_product_id = fields.Many2one('product.product', string="Freight")

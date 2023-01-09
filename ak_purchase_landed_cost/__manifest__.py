@@ -25,10 +25,11 @@
     'category': 'purchase',
     'version': '15.0.1.0.0',
     'depends': [
-        'purchase', 'stock', 'stock_landed_costs'
+        'purchase', 'stock', 'stock_landed_costs', 'account'
     ],
     'data': [
         'views/stock_landed_cost_views.xml',
+        'views/product_views.xml'
     ],
     'images': ['static/description/Banner.jpg'],
 }
