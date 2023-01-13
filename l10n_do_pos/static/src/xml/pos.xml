@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template">
+    <t t-name="l10n_do_pos.ClientDetailsEdit" t-inherit="point_of_sale.ClientDetailsEdit" t-inherit-mode="extension">
+        <xpath expr="//section/div/div[hasclass('client-details-left')]" position="inside">
+            <div class='client-detail'>
+                <span class='label'>Payer Type</span>
+                <select class='client-detail' name='payer_type' id="payer_type" t-model="state.l10n_do_dgii_tax_payer_type">
+                    <option value=''>None</option>
+                    <option value='taxpayer'>
+                        <t t-esc="'Contribuyente'"/>
+                    </option>
+                    <option value='non_payer'>
+                        <t t-esc="'Cliente de Consumo'"/>
+                    </option>
+                    <option value='nonprofit'>
+                        <t t-esc="'Sin fines de lucro'"/>
+                    </option>
+                    <option value='special'>
+                        <t t-esc="'Exento'"/>
+                    </option>
+                    <option value='governmental'>
+                        <t t-esc="'Gubernamental'"/>
+                    </option>
+                    <option value='foreigner'>
+                        <t t-esc="'Extranjero'"/>
+                    </option>
+                </select>
+            </div>
+        </xpath>
+    </t>
+
 
     <t t-extend="ClientDetailsEdit">
         <t t-jquery=".client-name" t-operation="replace">

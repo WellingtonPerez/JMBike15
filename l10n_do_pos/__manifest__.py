@@ -47,6 +47,8 @@
             'l10n_do_pos/static/src/js/models.js',
             'l10n_do_pos/static/src/js/screens.js',
             'l10n_do_pos/static/src/js/db.js',
+            'l10n_do_pos/static/src/js/Screens/ClientListScreen/ClientDetailsEdit.js',
+            'l10n_do_pos/static/src/js/Screens/ProductScreen/ActionpadWidget.js',
         ],
         'web.assets_qweb': [
             'l10n_do_pos/static/src/xml/**/*',

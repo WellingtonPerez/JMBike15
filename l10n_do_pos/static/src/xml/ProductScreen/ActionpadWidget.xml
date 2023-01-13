@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template">
+    <t t-name="l10n_do_pos.ActionpadWidget" t-inherit="point_of_sale.ActionpadWidget" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('actionpad')]/button/t[@t-if='client']" position="replace">
+            <t t-if="client">
+                <t t-esc="props.client.l10n_do_dgii_tax_payer_type"/><br/>
+                <t t-esc="client.name" />
+            </t>
+        </xpath>
+    </t>
+</templates>
