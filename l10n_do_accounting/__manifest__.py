@@ -11,12 +11,12 @@
     "author": "Adel Networks S,R,L",
     "category": "Localization",
     "license": "LGPL-3",
-    "version": "15.0.1.0.0",
+    "version": "15.0.1.0.1",
     # any module necessary for this one to work correctly
     "depends": ["web","l10n_latam_invoice", "l10n_do"],
     # always loaded
     "data": [
-        'data/ir_config_parameters.xml',
+        #'data/ir_config_parameters.xml', removed in favor of another module
         "security/res_groups.xml",
         "security/ir.model.access.csv",
         "data/l10n_latam.document.type.csv",
@@ -40,11 +40,15 @@
         
 
     ],
-    "external_dependencies": {"python": ["python-stdnum==1.13"]},
+    # "external_dependencies": {"python": ["python-stdnum==1.13"]}, removed in favor of another module
     'assets': {
         'web.assets_backend': [
-            'l10n_do_accounting/static/src/js/l10n_do_accounting.js',
-        ],
+            # 'l10n_do_accounting/static/src/js/l10n_do_accounting.js',
+            'l10n_do_accounting/static/src/js/fiscal_sequence_warning.js',
+            'l10n_do_accounting/static/src/scss/fiscal_sequence_warning.scss'
+            
+            
+        ], 
     },
     # only loaded in demonstration mode
     "demo": [
