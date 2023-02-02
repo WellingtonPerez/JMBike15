@@ -271,11 +271,11 @@ odoo.define("l10n_do_pos.models", function (require) {
      * @private
      */
     _save_to_server: function (orders, options) {
-        var self = this;
+      var self = this;
       var server = _super_posmodel._save_to_server.call(this, orders, options);
       server.then(function (result){
         var currentOrder = self.get_order();
-        if(result.length > 0){
+        if(result.length > 0 && currentOrder){
           if(result[0].pos_reference == currentOrder.name){
             currentOrder.ncf = result[0].ncf;
             currentOrder.sale_fiscal_type = result[0].sale_fiscal_type;
