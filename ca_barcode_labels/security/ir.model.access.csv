@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ca_barcode_configuration,barcode.configuration.template,model_barcode_configuration_template,group_allow_barcode_labels,1,1,1,1
+access_ca_barcode_product_label,product.label,model_product_label,group_allow_barcode_labels,1,1,1,1
+access_ca_barcode_product_label_line,product.label.line,model_product_label_line,group_allow_barcode_labels,1,1,1,1
