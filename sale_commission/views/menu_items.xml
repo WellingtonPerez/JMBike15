@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="sale_commission_config" name="Sale Commissions" parent="sale.menu_sale_config"/>
+
+        <menuitem id="sale_commission_target" name="Sale Targets" parent="sale_commission.sale_commission_config"
+                  action="sale_commission.sale_commission_target_action"/>
+
+        <menuitem id="sale_commission_range" name="Sale Range" parent="sale_commission.sale_commission_config"
+                  action="sale_commission.sale_commission_range_action"/>
+
+        <menuitem id="sale_commission" name="Sale Commissions" parent="sale.sale_order_menu"
+                  action="sale_commission.sale_commission_action"/>
+
+        <menuitem id="sale_commission_item" name="Sale Commission Items" parent="sale.sale_order_menu"
+                  action="sale_commission.sale_commission_item_action"/>
+
+
+
+
+    </data>
+</odoo>

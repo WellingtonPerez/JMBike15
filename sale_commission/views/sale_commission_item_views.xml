@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+       <record id="sale_commission_item_view_tree" model="ir.ui.view">
+           <field name="name">sale_commission_item_view_tree</field>
+           <field name="model">sale.commission.item</field>
+           <field name="arch" type="xml">
+               <tree string="sale_commission_item_view_tree" create="false" edit="false" delete="false">
+                   <field name="order_id"/>
+                   <field name="invoice_id"/>
+                   <field name="payment_id"/>
+                   <field name="user_id"/>
+                   <field name="partner_id"/>
+                   <field name="commission_percent"/>
+                   <field name="invoiced_amount"/>
+                   <field name="paid_amount"/>
+                   <field name="amount"/>
+                   <field name="state"/>
+                   <field name="currency_id" invisible="1"/>
+               </tree>
+           </field>
+       </record>
+
+        <record id="sale_commission_item_view_form" model="ir.ui.view">
+            <field name="name">sale_commission_item_view_form</field>
+            <field name="model">sale.commission.item</field>
+            <field name="arch" type="xml">
+                <form string="sale_commission_item_form" create="false" edit="false" delete="false">
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="order_id"/>
+                            <field name="invoice_id"/>
+                            <field name="payment_id"/>
+                            <field name="user_id"/>
+                            <field name="partner_id"/>
+                            <field name="commission_percent"/>
+                            <field name="invoiced_amount"/>
+                            <field name="paid_amount"/>
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_commission_item_view_search" model="ir.ui.view">
+            <field name="name">sale_commission_item_view_search</field>
+            <field name="model">sale.commission.item</field>
+            <field name="priority">32</field>
+            <field name="arch" type="xml">
+                <search string="Sale Commissions Analysis">
+                    <field name="user_id" string="Salesperson"/>
+                    <separator/>
+                    <filter string="Creation Date" name="filter_create_date" date="create_date" default_period="this_year"/>
+<!--                    <filter string="Expected Closing" name="filter_date_deadline" date="date_deadline"/>-->
+<!--                    <filter string="Date Closed" name="date_closed_filter" date="date_closed"/>-->
+<!--                    <group expand="0" string="Extended Filters">-->
+<!--                        <field name="partner_id" filter_domain="[('partner_id','child_of',self)]"/>-->
+<!--                        <field name="stage_id" domain="['|', ('team_id', '=', False), ('team_id', '=', 'team_id')]"/>-->
+<!--                        <field name="campaign_id"/>-->
+<!--                        <field name="medium_id"/>-->
+<!--                        <field name="source_id"/>-->
+<!--                        <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>-->
+<!--                        <newline/>-->
+<!--                        <field name="create_date"/>-->
+<!--                        <field name="date_open"/>-->
+<!--                        <field name="date_closed"/>-->
+<!--                    </group>-->
+<!--                    <group expand="1" string="Group By">-->
+<!--                        <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}" />-->
+<!--                        <filter string="Sales Team" name="saleschannel" context="{'group_by':'team_id'}"/>-->
+<!--                        <filter string="City" name="city" context="{'group_by':'city'}" />-->
+<!--                        <filter string="Country" name="country" context="{'group_by':'country_id'}" />-->
+<!--                        <filter string="Company" name="company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>-->
+<!--                        <filter string="Stage" name="stage" context="{'group_by':'stage_id'}"/>-->
+<!--                        <separator orientation="vertical" />-->
+<!--                        <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>-->
+<!--                        <filter string="Conversion Date" context="{'group_by':'date_conversion:month'}" name="conversion_date" help="Conversion Date from Lead to Opportunity"/>-->
+<!--                        <filter string="Expected Closing" context="{'group_by':'date_deadline:month'}" name="date_deadline"/>-->
+<!--                        <filter string="Closed Date" context="{'group_by':'date_closed'}" name="date_closed_groupby"/>-->
+<!--                        <filter string="Lost Reason" name="lostreason" context="{'group_by':'lost_reason'}"/>-->
+<!--                    </group>-->
+                </search>
+            </field>
+        </record>
+
+        <record id="sale_commission_item_action" model="ir.actions.act_window">
+            <field name="name">Sale Commission Item</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.commission.item</field>
+            <field name="view_mode">tree,form,graph,pivot</field>
+        </record>
+
+
+    </data>
+</odoo>

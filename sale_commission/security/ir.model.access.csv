@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sale_commission,Commissions,model_sale_commission,sales_team.group_sale_manager,1,1,1,1
+access_sale_commission_target,Commission Target,model_sale_commission_target,sales_team.group_sale_manager,1,1,1,1
+access_sale_commission_range,Commission Range,model_sale_commission_range,sales_team.group_sale_manager,1,1,1,1
+access_sale_commission_item,Commission Items,model_sale_commission_item,sales_team.group_sale_manager,1,1,1,1
+access_sale_commission_payment_amount,Commission Payment Amount,model_sale_commission_payment_amount,sales_team.group_sale_manager,1,1,1,1

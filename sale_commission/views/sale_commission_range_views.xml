@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="sale_commission_range_view_form" model="ir.ui.view">
+            <field name="name">sale_commission_range_view_form</field>
+            <field name="model">sale.commission.range</field>
+            <field name="arch" type="xml">
+                <form string="sale_commission_range_form">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="commission_type"/>
+                        </group>
+                        <group col="4">
+                                <field name="commission_percent"/>
+                                <field name="no_limit" attrs="{'invisible':[('commission_type','=','third')]}"/>
+                                <field name="min"
+                                       attrs="{'required':[('commission_type','!=','third')], 'invisible':[('commission_type','=','third')]}"/>
+                                <field name="max"
+                                       attrs="{'required':[('no_limit','=',False)],'invisible':[('commission_type','=','third')]}"/>
+                                <field name="partner_id" attrs="{'invisible':[('commission_type','!=','third')]}"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_commission_range_view_tree" model="ir.ui.view">
+            <field name="name">sale_commission_range_view_tree</field>
+            <field name="model">sale.commission.range</field>
+            <field name="arch" type="xml">
+                <tree string="sale_commission_range_tree">
+                    <field name="name"/>
+                    <field name="min"/>
+                    <field name="max"/>
+                    <field name="commission_percent"/>
+                    <field name="commission_type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="sale_commission_range_action" model="ir.actions.act_window">
+            <field name="name">Sale ranges</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.commission.range</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>

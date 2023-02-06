@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="sale_commission_target_view_form" model="ir.ui.view">
+            <field name="name">sale_commission_target_view_form</field>
+            <field name="model">sale.commission.target</field>
+            <field name="arch" type="xml">
+                <form string="sale_commission_target_form">
+                    <sheet>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="target"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_commission_target_view_tree" model="ir.ui.view">
+            <field name="name">sale_commission_target_view_tree</field>
+            <field name="model">sale.commission.target</field>
+            <field name="arch" type="xml">
+                <tree string="sale_commission_target_tree">
+                    <field name="user_id"/>
+                    <field name="target"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="currency_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="sale_commission_target_action" model="ir.actions.act_window">
+            <field name="name">Sale Targets</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.commission.target</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>
