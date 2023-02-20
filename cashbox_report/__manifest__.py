@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cierre de Caja',
-    'version': '12.0',
+    'version': '15.0.0.0',
     'category': '',
     'summary': "Cierre de Caja",
     'author': 'Yasmany Castillo <yasmany003@gmail.com>',

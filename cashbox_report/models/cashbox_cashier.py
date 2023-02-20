@@ -250,7 +250,7 @@ class CashboxCashier(models.Model):
         payments = sorted(list(payment_ids))
 
         for p in payment_obj.browse(payments):
-            p_date = date.strftime(pdate, '%Y-%m-%d')
+            p_date = date.strftime(p.date, '%Y-%m-%d')
             print(p_date)
             other_payment_details.append({
                 'Fecha': "{}/{}/{}".format(p_date[8:10], p_date[5:7], p_date[:4]),
