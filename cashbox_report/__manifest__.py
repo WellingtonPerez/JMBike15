@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cierre de Caja',
-    'version': '15.0.0.0',
+    'version': '12.0',
     'category': '',
     'summary': "Cierre de Caja",
     'author': 'Yasmany Castillo <yasmany003@gmail.com>',
     'license': 'AGPL-3',
-    'depends': ['account'],
+    'depends': ['account','point_of_sale'],
     'data': [
         'security/security_groups.xml',
         'security/ir.model.access.csv',

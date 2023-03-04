@@ -1,4 +1,5 @@
-from datetime import date, datetime as dt
+from datetime import date, datetime
+import time
 from operator import itemgetter
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, RedirectWarning
@@ -203,12 +204,33 @@ class CashboxCashier(models.Model):
         
         payment_methods = {}
         payment_obj = self.env['account.payment']
+        pos_payment_obj = self.env['pos.payment']
         payment_ids, other_payment_details = [], []
 
         domain = [('date', '=', self.date),
-                  ('payment_type', '=', 'inbound'),
                   ('company_id', '=', self.env.user.company_id.id),
+                  ('payment_type', '=', 'inbound'),
                   ('state', 'in',['posted','reconciled'])]
+
+        pos_domain = [
+                      ('payment_date', '<=', datetime.combine(self.date, datetime.max.time())),
+                      ('payment_date', '>=', datetime.combine(self.date, datetime.min.time())),
+                      ('company_id', '=', self.env.user.company_id.id)
+                      ]
+        # import pdb;pdb.set_trace();
+        for rec in pos_payment_obj.search(pos_domain):
+            journal_name = rec.payment_method_id.journal_id.name           
+            if rec.payment_method_id.close_type =='bank':
+                self.bank_amount += rec.amount
+            elif rec.payment_method_id.close_type =='check':
+                self.check_amount += rec.amount
+            elif rec.payment_method_id.close_type =='card':
+                self.credit_card_amount += rec.amount
+            elif rec.payment_method_id.close_type =='cash':
+                self.cash_amount += rec.amount
+            elif rec.payment_method_id.close_type =='transfer':
+                self.transfer_amount += rec.amount
+
         
         for rec in payment_obj.search(domain):
             journal_name = rec.journal_id.name           
@@ -265,6 +287,7 @@ class CashboxCashier(models.Model):
     #@api.multi
     def _prepare_invoice_detail(self, journals):
         payment_obj = self.env['account.payment']
+        pos_payment_obj = self.env['pos.payment']
         invoice_details, invoice_headers, credit_notes_issued = {}, [], 0.0
         credit_notes_applied, balance_favor, advance = 0.0, 0.0, 0.0
 
