@@ -15,21 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with NCF Manager.  If not, see <https://www.gnu.org/licenses/>.
 
-from odoo.addons.point_of_sale.wizard.pos_box import PosBox
-from odoo import api
+#from odoo.addons.point_of_sale.wizard.pos_box import PosBox
+#from odoo import api
 
 
-class PosBoxOut(PosBox):
+#class PosBoxOut(PosBox):
 
-    _inherit = "cash.box.out"
+  #  _inherit = "cash.box.out"
 
-    @api.model
-    def default_get(self, fields):
-        data = self._context
-        res = super(PosBoxOut, self).default_get(fields)
-        pos_session = self.env[data['active_model']].browse(data['active_id'])
-        date = pos_session.start_at
-        res.update({
-            'name': pos_session.config_id.name + ' ' + str(date)
-        })
-        return res
+   # @api.model
+   # def default_get(self, fields):
+    #    data = self._context
+       # res = super(PosBoxOut, self).default_get(fields)
+       # pos_session = self.env[data['active_model']].browse(data['active_id'])
+      #  date = pos_session.start_at
+     #   res.update({
+      #      'name': pos_session.config_id.name + ' ' + str(date)
+       # })
+     #   return res
