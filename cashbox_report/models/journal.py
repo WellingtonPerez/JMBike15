@@ -11,12 +11,3 @@ class AccountJournal(models.Model):
                                               ('transfer','Tranferencias')],
                                             required=False,
                                             copy=False)
-
-class PosPaymentMethod(models.Model):   
-    _inherit = 'pos.payment.method'
-
-    close_type = fields.Selection([('cash','Efectivo'),
-                                              ('bank','Banco'),
-                                              ('card','Tarjetas'),
-                                              ('check','Cheque'),
-                                              ('transfer','Tranferencias')], related='journal_id.close_type')
