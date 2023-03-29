@@ -1,10 +1,10 @@
-from datetime import date, datetime as dt
+from datetime import date, datetime
+import time
 from operator import itemgetter
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, RedirectWarning
 from odoo.addons import decimal_precision as dp
 import logging
-
 _logger = logging.getLogger(__name__)
 
 
@@ -13,12 +13,12 @@ class CashboxCoin(models.Model):
     _name = 'cashbox.coin'
     _order = 'coin_value'
 
-    # @api.one
-    # @api.depends('coin_value', 'number')
+    #@api.one
+    #@api.depends('coin_value', 'number')
     def _sub_total(self):
         """ Calculate Sub total"""
-        # self.ensure_one()
-        # self.subtotal = self.coin_value * self.number
+        #self.ensure_one()
+        #self.subtotal = self.coin_value * self.number
         for rec in self:
             rec.subtotal = rec.coin_value * rec.number
 
@@ -39,6 +39,7 @@ class CashboxCashier(models.Model):
     _name = 'cashbox.cashier'
     _order = 'date'
 
+    
     def _set_cashbox_line_values(self):
         coin_values = [1, 5, 10, 25, 50, 100, 200, 500, 1000, 2000]
         for record in self.cashbox_lines_ids.search([]):
@@ -57,7 +58,7 @@ class CashboxCashier(models.Model):
         default=_('Nuevo'),
     )
     date = fields.Date(string="Fecha", default=fields.Date.context_today)
-
+   
     cashbox_lines_ids = fields.One2many(
         comodel_name='cashbox.coin',
         inverse_name="cashbox_cashier_id",
@@ -93,7 +94,7 @@ class CashboxCashier(models.Model):
         digits=dp.get_precision('Product Price'),
         copy=False,
     )
-
+    
     cashbox_id = fields.Many2one(
         comodel_name="account.cashbox",
         string="Cierre",
@@ -109,8 +110,8 @@ class CashboxCashier(models.Model):
     user_id = fields.Many2one(
         'res.users',
         string='Usuario ID',
-        # default=lambda self: self.env.user,
-        # required=True,
+        #default=lambda self: self.env.user,
+        #required=True,
     )
     state = fields.Selection(
         string="Estado",
@@ -133,19 +134,19 @@ class CashboxCashier(models.Model):
                 'cashbox.cashier') or _('New')
         return super(CashboxCashier, self).create(values)
 
-    # @api.multi
+    #@api.multi
     def action_confirmed(self):
         self.write({'state': 'confirmed'})
 
-    # @api.multi
+    #@api.multi
     def action_accepted(self):
         self.write({'state': 'accepted'})
 
-    # @api.multi
+    #@api.multi
     def action_denied(self):
         self.write({'state': 'denied'})
 
-    # @api.multi
+    #@api.multi
     def action_cancel(self):
         for rec in self:
             if rec.state != 'draft':
@@ -153,11 +154,11 @@ class CashboxCashier(models.Model):
                                       "esta borrador.")
         self.write({'state': 'cancel'})
 
-    # @api.multi
+    #@api.multi
     def action_to_draft(self):
         self.write({'state': 'draft'})
 
-    # @api.multi
+    #@api.multi
     def _get_journal_ids(self, type='sale'):
         journal_domain = [('company_id', '=', self.env.user.company_id.id)]
 
@@ -165,71 +166,90 @@ class CashboxCashier(models.Model):
             journal_domain.append(('type', 'in', ['sale', 'cash', 'bank']))
         else:
             journal_domain.append(('type', '=', 'sale'))
-            # journal_domain.append(('ncf_control', '=', True))
+            #journal_domain.append(('ncf_control', '=', True))
 
         journal_ids = self.env['account.journal'].search(journal_domain)
         return journal_ids
 
     def _check_cash_invoice(self, invoice):
-        if invoice.invoice_date == self.date and (
-                invoice.payment_state == 'paid' or invoice.payment_state == 'in_payment'):
-            return True
-
+        if invoice.invoice_date == self.date and (invoice.payment_state == 'paid' or invoice.payment_state == 'in_payment'):
+           return True
+        
         if invoice.invoice_date == self.date and invoice.payment_state != 'paid':
             return False
 
         if not invoice.invoice_payment_term_id or invoice.invoice_payment_term_id.id != 1:
             return False
-
+        
         return True
 
     @api.onchange('user_id')
     def _sum_values(self):
         pass
-        # self.bank_amount =  99999
-        # self.check_amount = 8999
-        # self.credit_card_amount = 77777
-        # msg = "ON CHANGE"
-        # action = self.env.ref('cashbox_report.action_cashbox_cashier')
-        # action['domain'] = [('id', 'in', report_exists.ids)]
-        # raise ValidationError(msg)
+        #self.bank_amount =  99999
+        #self.check_amount = 8999
+        #self.credit_card_amount = 77777
+        #msg = "ON CHANGE"
+            # action = self.env.ref('cashbox_report.action_cashbox_cashier')
+            # action['domain'] = [('id', 'in', report_exists.ids)]
+        #raise ValidationError(msg)
 
-    # @api.multi
+    #@api.multi
     def _prepare_payment_info(self):
         self.bank_amount = 0
         self.check_amount = 0
         self.credit_card_amount = 0
         self.cash_amount = 0
         self.transfer_amount = 0
-
+        
         payment_methods = {}
         payment_obj = self.env['account.payment']
         pos_payment_obj = self.env['pos.payment']
         payment_ids, other_payment_details = [], []
 
         domain = [('date', '=', self.date),
-                  ('payment_type', '=', 'inbound'),
                   ('company_id', '=', self.env.user.company_id.id),
-                  ('state', 'in', ['posted', 'reconciled'])]
+                  ('payment_type', '=', 'inbound'),
+                  ('state', 'in',['posted','reconciled'])]
 
-        for rec in payment_obj.search(domain):
-            journal_name = rec.journal_id.name
-            if rec.journal_id.close_type == 'bank':
+        pos_domain = [
+                      ('payment_date', '<=', datetime.combine(self.date, datetime.max.time())),
+                      ('payment_date', '>=', datetime.combine(self.date, datetime.min.time())),
+                      ('company_id', '=', self.env.user.company_id.id)
+                      ]
+        # import pdb;pdb.set_trace();
+        for rec in pos_payment_obj.search(pos_domain):
+            journal_name = rec.payment_method_id.journal_id.name           
+            if rec.payment_method_id.close_type =='bank':
                 self.bank_amount += rec.amount
-            elif rec.journal_id.close_type == 'check':
+            elif rec.payment_method_id.close_type =='check':
                 self.check_amount += rec.amount
-            elif rec.journal_id.close_type == 'card':
+            elif rec.payment_method_id.close_type =='card':
                 self.credit_card_amount += rec.amount
-            elif rec.journal_id.close_type == 'cash':
+            elif rec.payment_method_id.close_type =='cash':
                 self.cash_amount += rec.amount
-            elif rec.journal_id.close_type == 'transfer':
+            elif rec.payment_method_id.close_type =='transfer':
+                self.transfer_amount += rec.amount
+
+        
+        for rec in payment_obj.search(domain):
+            journal_name = rec.journal_id.name           
+            if rec.journal_id.close_type =='bank':
+                self.bank_amount += rec.amount
+            elif rec.journal_id.close_type =='check':
+                self.check_amount += rec.amount
+            elif rec.journal_id.close_type =='card':
+                self.credit_card_amount += rec.amount
+            elif rec.journal_id.close_type =='cash':
+                self.cash_amount += rec.amount
+            elif rec.journal_id.close_type =='transfer':
                 self.transfer_amount += rec.amount
 
             amount = 0.0
             if rec.reconciled_invoice_ids:
-                # invoices_a = rec.invoice_ids.filtered(
+                #invoices_a = rec.invoice_ids.filtered(
                 #    lambda invoice: invoice.journal_id.ncf_control == True)
-                # if invoices_a:
+                #if invoices_a:
                 #    amount = rec.amount
 
                 invoices = rec.reconciled_invoice_ids.filtered(
@@ -253,6 +273,7 @@ class CashboxCashier(models.Model):
 
         for p in payment_obj.browse(payments):
             p_date = date.strftime(p.date, '%Y-%m-%d')
+            print(p_date)
             other_payment_details.append({
                 'Fecha': "{}/{}/{}".format(p_date[8:10], p_date[5:7], p_date[:4]),
                 'Referencia': p.name,
@@ -261,33 +282,12 @@ class CashboxCashier(models.Model):
                 'Metodo de pago': p.journal_id.name,
             })
 
-        pos_domain = [('payment_date', '>', '%s 00:00:00' % self.date),
-                      ('payment_date', '<', '%s 23:59:59' % self.date),
-                      ('company_id', '=', self.env.user.company_id.id)]
-
-        for rec in pos_payment_obj.search(pos_domain):
-            journal_name = rec.payment_method_id.journal_id.name
-            if rec.payment_method_id.l10n_do_payment_form == 'bank':
-                self.bank_amount += rec.amount
-            elif rec.payment_method_id.l10n_do_payment_form == 'check':
-                self.check_amount += rec.amount
-            elif rec.payment_method_id.l10n_do_payment_form == 'card':
-                self.credit_card_amount += rec.amount
-            elif rec.payment_method_id.l10n_do_payment_form == 'cash':
-                self.cash_amount += rec.amount
-            elif rec.payment_method_id.l10n_do_payment_form == 'transfer':
-                self.transfer_amount += rec.amount
-
-            if journal_name in payment_methods.keys():
-                payment_methods[journal_name] += rec.amount
-            else:
-                payment_methods[journal_name] = rec.amount
-
         return (payment_methods, other_payment_details)
 
-    # @api.multi
+    #@api.multi
     def _prepare_invoice_detail(self, journals):
         payment_obj = self.env['account.payment']
+        pos_payment_obj = self.env['pos.payment']
         invoice_details, invoice_headers, credit_notes_issued = {}, [], 0.0
         credit_notes_applied, balance_favor, advance = 0.0, 0.0, 0.0
 
@@ -296,15 +296,15 @@ class CashboxCashier(models.Model):
             domain = [
                 ('move_type', 'in', ['out_invoice', 'out_refund']),
                 ('invoice_date', '=', self.date),
-                ('payment_state', 'in', ['not_paid', 'paid', 'in_payment']),
+                ('payment_state', 'in', ['not_paid', 'paid','in_payment']),
                 ('company_id', '=', self.env.user.company_id.id),
                 ('user_id', '=', self.user_id.id),
                 ('journal_id', '=', journal.id)]
 
             for inv in self.env['account.move'].search(
-                    domain, order="name asc"):
+                domain, order="name asc"):
 
-                payments = inv._get_reconciled_info_JSON_values()  # _get_payments_vals()
+                payments = inv._get_reconciled_info_JSON_values() # _get_payments_vals()
                 cash_invoice = self._check_cash_invoice(inv)
 
                 values = {
@@ -321,7 +321,7 @@ class CashboxCashier(models.Model):
                     else:
                         values['Credito'] = inv.amount_total
 
-                if inv.move_type == 'out_refund' and inv.payment_state in ['not_paid', 'paid', 'in_payment']:
+                if inv.move_type == 'out_refund' and inv.payment_state in ['not_paid', 'paid','in_payment']:
                     if not values['number']:
                         values['number'] = inv.name
                     values['NC Emitidas'] = inv.amount_total
@@ -385,14 +385,14 @@ class CashboxCashier(models.Model):
         domain = [
             ('move_type', '=', 'out_invoice'),
             ('invoice_date', '=', self.date),
-            ('payment_state', 'in', ['not_paid', 'paid', 'in_payment']),
+            ('payment_state', 'in', ['not_paid', 'paid','in_payment']),
             ('company_id', '=', self.env.user.company_id.id),
             ('user_id', '=', self.user_id.id),
             ('journal_id', 'in', journals.ids)]
         for inv in invoice_obj.search(domain):
             journal = inv.journal_id.name
             record = data['info']
-            cash, credit, = 0.0, 0.0
+            cash, credit,  = 0.0, 0.0
             cash_invoice = self._check_cash_invoice(inv)
 
             if inv.move_type == 'out_invoice':
@@ -493,7 +493,7 @@ class CashboxCashier(models.Model):
     #     cashbox_id.write({'cashbox_coin_ids': cashbox_coins})
     #     return cashbox_id.ids
 
-    # @api.multi
+    #@api.multi
     def check_report(self):
         self.ensure_one()
         # Before prepare report, check is user have been

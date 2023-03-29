@@ -6,7 +6,7 @@
     'summary': "Cierre de Caja",
     'author': 'Yasmany Castillo <yasmany003@gmail.com>',
     'license': 'AGPL-3',
-    'depends': ['account', 'l10n_do_pos'],
+    'depends': ['account','point_of_sale'],
     'data': [
         'security/security_groups.xml',
         'security/ir.model.access.csv',
