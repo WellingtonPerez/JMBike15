@@ -1,5 +1,6 @@
 from odoo import fields, models
-
+from dateutil.relativedelta import relativedelta
+from datetime import date
 
 class ResCompany(models.Model):
     _inherit = "res.company"
@@ -22,11 +23,11 @@ class ResCompany(models.Model):
         "to have sales through offline mobile devices such as "
         "sales with Handheld, enter others.",
     )
+
+    # Corrección: Calcula la fecha de vencimiento del NCF para el último día del año siguiente
     l10n_do_ncf_exp_date = fields.Date(
         string="NCF Expiration date",
-        default=fields.Date.end_of(
-            fields.Date.today().replace(year=fields.Date.today().year + 1), "year"
-        ),
+        default=lambda self: date.today().replace(year=date.today().year + 1, month=12, day=31),
     )
 
     def _localization_use_documents(self):
@@ -36,5 +37,5 @@ class ResCompany(models.Model):
         return (
             True
             if self.country_id == self.env.ref("base.do")
-            else super()._localization_use_documents()
+            else False
         )
