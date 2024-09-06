@@ -210,7 +210,7 @@ class Partner(models.Model):
                     })
 
                     document = lxml.html.fromstring(
-                    session.get(url, timeout=30).text)
+                    session.get(url, timeout=30, verify=False).text)
 
                     validation = document.find('.//input[@name="__EVENTVALIDATION"]').get('value')
                     viewstate = document.find('.//input[@name="__VIEWSTATE"]').get('value')
@@ -222,7 +222,7 @@ class Partner(models.Model):
                     }
                     # Do the actual request
                     document = lxml.html.fromstring(
-                        session.post(url, data=data, timeout=30).text)
+                        session.post(url, data=data, timeout=30, verify=False).text)
 
                     result = document.find('.//div[@id="cphMain_divBusqueda"]')
                     message = document.findtext('.//*[@id="cphMain_lblInformacion"]')
